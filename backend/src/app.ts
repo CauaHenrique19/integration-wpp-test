@@ -10,7 +10,7 @@ const io = new Server(server, { cors: { origin: '*' } })
 
 io.on('connect', (socket) => {
     const sock = makeWALegacySocket({ printQRInTerminal: false })
-
+    
     sock.ev.on('connection.update', (data) => {
         socket.emit('qrcode', data.qr)
     })
@@ -21,12 +21,18 @@ io.on('connect', (socket) => {
     // })
 
     //Recebe as mensagens
-    sock.ev.on('messages.upsert', (messages) => {
+    sock.ev.on('messages.upsert', async (messages) => {
+        const url = await sock.profilePictureUrl('5521988739221@s.whatsapp.net');
+        console.log(url)
         socket.emit('message', messages)
     })
 
+    sock.ev.on('contacts.upsert', (contact) => {
+        console.log('contact', contact)
+    })
+
     socket.on('send_message', async (message) => {
-        await sock.sendMessage('5521965538291@s.whatsapp.net', { text: message })
+        await sock.sendMessage('5521988739221@s.whatsapp.net', { text: message })
     })
 })
 
