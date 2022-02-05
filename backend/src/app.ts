@@ -15,24 +15,24 @@ io.on('connect', (socket) => {
         socket.emit('qrcode', data.qr)
     })
     
-    // sock.ev.on('chats.set', (chats) => {
-    //     const chatsTransformed = chats.chats.map(chat => ({ ...chat, conversationTimestampString: new Date(Number(chat.conversationTimestamp))  }))
-    //     socket.emit('chats', chatsTransformed)
-    // })
-
     //Recebe as mensagens
     sock.ev.on('messages.upsert', async (messages) => {
-        const url = await sock.profilePictureUrl('5521988739221@s.whatsapp.net');
-        console.log(url)
-        socket.emit('message', messages)
+        if(messages.messages[0].key.remoteJid.includes('@s.whatsapp.net')){
+            const url = await sock.profilePictureUrl('5521982705373@s.whatsapp.net');
+            console.log(url)
+            socket.emit('message', messages)
+
+            sock.ev.on('contacts.update', (contacts) => console.log(contacts))
+        }
     })
 
-    sock.ev.on('contacts.upsert', (contact) => {
-        console.log('contact', contact)
+    sock.ev.on('contacts.set', (contact) => {
+        const contacts = contact.contacts.filter(contact => contact.name !== undefined && contact.id.includes('@s.whatsapp.net'))
+        console.log('contact', contacts)
     })
 
     socket.on('send_message', async (message) => {
-        await sock.sendMessage('5521988739221@s.whatsapp.net', { text: message })
+        await sock.sendMessage('5521982705373@s.whatsapp.net', { text: message })
     })
 })
 
